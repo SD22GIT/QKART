@@ -53,8 +53,18 @@
     background-color: #00845c !important;
 }
 
+#circularAnimation
+{
+  text-align: center;
+  height: 2rem;
+}
+
 @media screen and (min-width: 768px) {
   .form {
     min-width: 24rem;
   }
+    .content{
+      justify-content: flex-end;
+    }
 }
+
