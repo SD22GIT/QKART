@@ -1,24 +1,17 @@
-import { Button, CircularProgress, Stack, TextField ,Link } from "@mui/material";
+import { Button, CircularProgress, Stack, TextField, Link } from "@mui/material";
 import { Box } from "@mui/system";
 import axios from "axios";
 import { useSnackbar } from "notistack";
 import React, { useState } from "react";
+import { useHistory } from "react-router-dom";
 import { config } from "../App";
 import Footer from "./Footer";
 import Header from "./Header";
-import { useHistory } from "react-router-dom";
-import "./Register.css";
+import "./Login.css";
 
-
- 
-
-
-  // TODO: CRIO_TASK_MODULE_REGISTER - Implement the register function
-
-
-  const Register = () => {
-    const { enqueueSnackbar} = useSnackbar();
-    const [formData, setFormData] = useState({});
+const Login = () => {
+  const { enqueueSnackbar } = useSnackbar();
+  const [formData, setFormData] = useState({});
     let [dataSend, setDataSend] = useState(false);
     const history = useHistory();
     let loadingAnimation;
@@ -30,43 +23,47 @@ import "./Register.css";
     else
     {
       loadingAnimation = <Button variant="contained" onClick={(e)=>{validateInput(formData)}}>
-      Register Now
-     </Button>;
+      LOGIN TO QKART
+     </Button>
     }
-
+  // TODO: CRIO_TASK_MODULE_LOGIN - Fetch the API response
   /**
-   * Definition for register handler
-   * - Function to be called when the user clicks on the register button or submits the register form
-   *
-   * @param {{ username: string, password: string, confirmPassword: string }} formData
+   * Perform the Login API call
+   * @param {{ username: string, password: string }} formData
    *  Object with values of username, password and confirm password user entered to register
    *
-   * API endpoint - "POST /auth/register"
+   * API endpoint - "POST /auth/login"
    *
-   * Example for successful response from backend for the API call:
+   * Example for successful response from backend:
    * HTTP 201
    * {
    *      "success": true,
+   *      "token": "testtoken",
+   *      "username": "criodo",
+   *      "balance": 5000
    * }
    *
-   * Example for failed response from backend for the API call:
+   * Example for failed response from backend:
    * HTTP 400
    * {
    *      "success": false,
-   *      "message": "Username is already taken"
+   *      "message": "Password is incorrect"
    * }
+   *
    */
-  const register = async (formData) => {
+  const login = async (formData) => {
+    console.log(formData);
     try
     {
-    const data = {username:formData.username, password:formData.password};
     setDataSend(true);
-    await axios.post(config.endpoint+"/auth/register", data);
-    enqueueSnackbar("Registered successfully",{
+    const response = await axios.post(config.endpoint+"/auth/login", formData);
+    enqueueSnackbar("Logged in successfully",{
       variant: 'success'
     })
+    persistLogin(response.data.token,response.data.username,response.data.balance);
     setDataSend(false);
-    history.push('/login');
+
+    history.push("/");
     }
     catch(error)
     {
@@ -82,41 +79,27 @@ import "./Register.css";
         })
       }
       setDataSend(false);
-    
     }
   };
 
-  // TODO: CRIO_TASK_MODULE_REGISTER - Implement user input validation logic
+  // TODO: CRIO_TASK_MODULE_LOGIN - Validate the input
   /**
    * Validate the input values so that any bad or illegal values are not passed to the backend.
    *
-   * @param {{ username: string, password: string, confirmPassword: string }} data
+   * @param {{ username: string, password: string }} data
    *  Object with values of username, password and confirm password user entered to register
    *
    * @returns {boolean}
    *    Whether validation has passed or not
    *
-   * Return false if any validation condition fails, otherwise return true.
+   * Return false and show warning message if any validation condition fails, otherwise return true.
    * (NOTE: The error messages to be shown for each of these cases, are given with them)
    * -    Check that username field is not an empty value - "Username is a required field"
-   * -    Check that username field is not less than 6 characters in length - "Username must be at least 6 characters"
    * -    Check that password field is not an empty value - "Password is a required field"
-   * -    Check that password field is not less than 6 characters in length - "Password must be at least 6 characters"
-   * -    Check that confirmPassword field has the same value as password field - Passwords do not match
    */
   const validateInput = (data) => {
 
-    if(data.username)
-    {
-        if(data.username.length<6)
-        {
-          enqueueSnackbar("Username must be at least 6 characters",{
-            variant: 'error',
-          });
-          return;
-        }
-    }
-    else
+    if(!data.username)
     {
       enqueueSnackbar("Username is a required field",{
         variant: 'error'
@@ -124,17 +107,7 @@ import "./Register.css";
       return;
     }
 
-    if(data.password)
-    {
-        if(data.password.length<6)
-        {
-          enqueueSnackbar("Password must be at least 6 characters",{
-            variant: 'error'
-          });
-          return;
-        }
-    }
-    else
+    if(!data.password)
     {
       enqueueSnackbar("Password is a required field",{
         variant: 'error'
@@ -142,17 +115,30 @@ import "./Register.css";
       return;
     }
 
+    login(data);
 
-    if(data.password !== data.confirmPassword)
-    {
-      enqueueSnackbar("Passwords do not match",{
-        variant: 'error'
-      });
-      return;
-    }
+  };
 
-    register(formData);
-
+  // TODO: CRIO_TASK_MODULE_LOGIN - Persist user's login information
+  /**
+   * Store the login information so that it can be used to identify the user in subsequent API calls
+   *
+   * @param {string} token
+   *    API token used for authentication of requests after logging in
+   * @param {string} username
+   *    Username of the logged in user
+   * @param {string} balance
+   *    Wallet balance amount of the logged in user
+   *
+   * Make use of localStorage: https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage
+   * -    `token` field in localStorage can be used to store the Oauth token
+   * -    `username` field in localStorage can be used to store the username that the user is logged in as
+   * -    `balance` field in localStorage can be used to store the balance amount in the user's wallet
+   */
+  const persistLogin = (token, username, balance) => {
+    localStorage.setItem("token", token);
+    localStorage.setItem("username", username);
+    localStorage.setItem("balance", balance);
   };
 
   return (
@@ -165,10 +151,10 @@ import "./Register.css";
       <Header hasHiddenAuthButtons={"true"} />
       <Box className="content">
         <Stack spacing={2} className="form">
-          <h2 className="title">Register</h2>
+        <h2 className="title">Login</h2>
           <TextField
             id="username"
-            label="Username"
+            label="username"
             variant="outlined"
             title="Username"
             name="username"
@@ -180,29 +166,18 @@ import "./Register.css";
           <TextField
             id="password"
             variant="outlined"
-            label="Password"
+            label="password"
             name="password"
             type="password"
-            helperText="Password must be atleast 6 characters length"
-            onChange={(e)=>{setFormData({ ...formData,
-              [e.target.name]: e.target.value})}}
             fullWidth
             placeholder="Enter a password with minimum 6 characters"
-          />
-          <TextField
-            id="confirmPassword"
-            variant="outlined"
-            label="Confirm Password"
-            name="confirmPassword"
-            type="password"
-            fullWidth
             onChange={(e)=>{setFormData({ ...formData,
               [e.target.name]: e.target.value})}}
           />
-           {loadingAnimation} 
-          <p className="secondary-action">
-            Already have an account?
-              <Link href="/login" style={{ textDecoration: 'none' }}>Login here</Link>
+         {loadingAnimation}
+     <p className="secondary-action">
+            Don't have an account?
+             <Link href="/register" style={{ textDecoration: 'none' }}>Register Now</Link>
           </p>
         </Stack>
       </Box>
@@ -211,4 +186,4 @@ import "./Register.css";
   );
 };
 
-export default Register;
+export default Login;
