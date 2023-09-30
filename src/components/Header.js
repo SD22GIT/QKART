@@ -32,7 +32,7 @@ const Header = ({ children, hasHiddenAuthButtons }) => {
       navigationButton= <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
       <Avatar img src="avatar.png" alt={username}></Avatar>
       <Box sx={{pl:2,pr:1}}>{username}</Box>
-      <Button variant="text" onClick={(e)=>{localStorage.clear();history.push("/")}}>
+      <Button variant="text" onClick={(e)=>{localStorage.clear();window.location.reload();history.push("/")}}>
       LOGOUT
      </Button>
     </Box>
@@ -50,12 +50,12 @@ const Header = ({ children, hasHiddenAuthButtons }) => {
   }
   }
 
-
     return (
       <Box className="header">
         <Box className="header-title">
             <img src="logo_light.svg" alt="QKart-icon"></img>
         </Box>
+      {children}
       {navigationButton}
       </Box>
     );
