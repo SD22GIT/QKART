@@ -137,6 +137,12 @@ const Checkout = () => {
     value: "",
   });
 
+  if(!localStorage.getItem("token"))
+  {
+    enqueueSnackbar("Please Login. Redirecting to Home Page.", { variant: "warning" });
+    history.push("/");
+  }
+
   // Fetch the entire products list
   const getProducts = async () => {
     console.log("Inside Checkout getProducts");
