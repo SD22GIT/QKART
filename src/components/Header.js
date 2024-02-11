@@ -6,6 +6,9 @@ import { useHistory} from "react-router-dom";
 import "./Header.css";
 
 const Header = ({ children, hasHiddenAuthButtons }) => {
+  console.log("Header component");
+  console.log(children);
+  console.log(hasHiddenAuthButtons);
   const history = useHistory();
 
   const goBackToProductPage = ()=>{

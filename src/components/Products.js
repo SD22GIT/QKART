@@ -40,8 +40,6 @@ const Products =   () => {
 
   const handleQuantityDelete = (cartItem)=>{
     console.log("Inside Handle Quantity Delete");
-    console.log(cartItem);
-
     let i=0;
     for(;i<cartData.length;++i)
     {
@@ -63,14 +61,12 @@ const Products =   () => {
       productId:cartItem._id,qty:finalQty
     };
     const token = localStorage.getItem("token");
-    console.log(token);
     let configHeader = {
       headers: {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       }
     }
-    console.log(config.endpoint);
     axios.post(`${config.endpoint}/cart`, data, configHeader).then(function (response) {
       console.log(response);
     })
@@ -82,8 +78,6 @@ const Products =   () => {
 
   const handleQuantityAdd = (cartItem)=>{
     console.log("Inside Handle Quantity Add");
-    console.log(cartItem);
-    console.log(cartData);
     let i=0;
     for(;i<cartData.length;++i)
     {
@@ -93,12 +87,10 @@ const Products =   () => {
         break;
       }
     }
-    console.log(cartData);
     let data = {
       productId:cartItem._id,qty:cartData[i].qty
     };
     const token = localStorage.getItem("token");
-    console.log(token);
     let configHeader = {
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -457,8 +449,9 @@ const Products =   () => {
   let page=productCards;
   if(username)
   {
+    const items = generateCartItemsFrom(cartData,data);
      page = <Grid container spacing={2}><Grid item md={9} xs={12}>{productCards}</Grid>
-   <Grid item md={3} xs={12}><Cart products={data} items={cartData} handleQuantity={{handleQuantityDelete:handleQuantityDelete,
+   <Grid item md={3} xs={12}><Cart products={data} items={items} handleQuantity={{handleQuantityDelete:handleQuantityDelete,
                                                                                                       handleQuantityAdd:handleQuantityAdd}}/></Grid>
 </Grid>
 };
